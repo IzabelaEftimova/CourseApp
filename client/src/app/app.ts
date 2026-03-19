@@ -1,43 +1,14 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { combineLatest, lastValueFrom } from 'rxjs';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { Nav } from "../layout/nav/nav";
-import { AccountService } from '../core/services/account-service';
-import { Home } from "../features/home/home";
-import { User } from '../types/user';
 
 @Component({
   selector: 'app-root',
-  imports: [Nav, Home],
+  imports: [Nav, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 
-export class App implements OnInit {
-  private accountService = inject(AccountService);
-  private http = inject(HttpClient);
-  protected title = 'App'; //name displayed in the browser
-  protected members = signal<User[]>([]);
-
-  async ngOnInit() {
-    this.members.set(await this.getmembers()) //displays members form database
-    this.setCurrentUser();
-  }
-
-  setCurrentUser() {
-    const userString = localStorage.getItem('user');
-    if (!userString) return;
-    const user = JSON.parse(userString);
-    this.accountService.currUser.set(user);
-  }
-
-  async getmembers() {
-    try {
-      return lastValueFrom(this.http.get<User[]>('https://localhost:5001/api/members'));
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
+export class App {
+  protected router = inject(Router);
 }

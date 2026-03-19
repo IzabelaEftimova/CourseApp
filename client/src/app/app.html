@@ -1,3 +1,9 @@
 <app-nav />
 
-<app-home [membersFromApp]="members()" /> <!-- the home componentt is a child of the app component -->
+<div 
+    [class.mt-24]="router.url != '/'"
+    [class.container]="router.url != '/'"
+    [class.mx-auto]="router.url != '/'">
+    
+    <router-outlet />
+</div>
