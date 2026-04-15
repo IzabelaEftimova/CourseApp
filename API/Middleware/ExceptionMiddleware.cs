@@ -1,7 +1,7 @@
 using System;
-using System.CodeDom;
 using System.Net;
 using System.Text.Json;
+using API.Errors;
 using API.Extensions;
 
 namespace API.Middleware;
@@ -14,24 +14,24 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         {
             await next(context);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex, "{message}", ex.Message);
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             var response = env.IsDevelopment()
-                         ? new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace)
-                         : new ApiException(context.Response.StatusCode, ex.Message, "Internal server error");
+                ? new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace)
+                : new ApiException(context.Response.StatusCode, ex.Message, "Internal server error");
 
             var options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-            
+
             var json = JsonSerializer.Serialize(response, options);
 
-            await context.Response.WriteAsJsonAsync(json);
+            await context.Response.WriteAsync(json);
         }
     }
 }
